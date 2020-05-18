@@ -1,0 +1,29 @@
+#substane
+sub_name = mol3.pdb mol2.pdb
+
+
+#material flows
+total_plates = 6
+input_plates = 3 4
+input_molecules1 = 330 230
+input_molecules2 = 220 120
+input_ensamble = NVT NPT
+input_init_molecules = 4000 4000
+initial_state = VAK
+input_temperature = 200.0 200.0
+
+#used only in NPT GEMC_NPT (bar)
+input_pressure = 2.0  2.0
+#used for NVT (mol/l)
+input_density = 20.0   20.0
+
+#plate volume Angstrom
+plate_volume = 10000
+
+potential = LJ
+charge = false
+
+
+
+#energy flows
+

@@ -1,0 +1,36 @@
+Parameters     	 ../../common/Par_Vrabec01_Noble_Gases_Exotic.inp
+
+####################################
+# INPUT PDB FILES
+####################################
+Coordinates 0    STEP3_START_NE_sys_BOX_0.pdb
+
+
+####################################
+# INPUT PSF FILES
+####################################
+Structure 0  	 STEP3_START_NE_sys_BOX_0.psf
+
+#############################
+# SIMULATION CONDITION   
+#############################
+Temperature     34.00
+
+################################
+# STEPS 
+################################
+RunSteps           1000000      
+EqSteps		   500000       
+AdjSteps	   1000        
+
+################################
+# BOX DIMENSION #, X, Y, Z
+################################
+CellBasisVector1 0	90.20	0.00	0.00
+CellBasisVector2 0	0.00	90.20	0.00
+CellBasisVector3 0	0.00	0.00	90.20
+
+##########################
+# statistics filename add
+##########################
+OutputName  neon_34_00_K
