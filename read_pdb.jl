@@ -14,11 +14,14 @@ mutable struct molecule
     connect::AbstractArray  #
     element::AbstractArray  #element name
     
+    #non standart
+    nsQ::AbstractArray #charge
+    
     #molType::AbstractArray #numbers of each type
 end
 
 function set_molecule()
-    return molecule(0,0,[0],[0],["0"],["0"],[0.0],[0.0],[0.0],[0,0],["a", "a"])
+    return molecule(0,0,[0],[0],["0"],["0"],[0.0],[0.0],[0.0],[0,0],["a", "a"], [0.0, 0.0])
 end
 
 function read_pdb(fileName)
@@ -33,7 +36,9 @@ function read_pdb(fileName)
         end
     end
     seekstart(fileId)
-    temp = collect(str for str in eachline(fileId) if length(str) > 6)
+    temp = collect(str for str in eachline(fileId) if length(str) > 6)  #need 2 step if length < 6
+    atomString = collect(str for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")    #get atomstring
+    
     mol.atomName = collect(lstrip(str[13:16]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")
     mol.molName = collect(lstrip(str[18:20]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")
     mol.x = collect(parse(Float64,str[31:38]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")
@@ -45,7 +50,26 @@ function read_pdb(fileName)
     mol.element = collect(lstrip(str[77:78]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")
     
     mol.molNum = maximum(collect(parse(Int64,str[23:26]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM"))
-    println(mol.atomName)
+    
+    #nonstandart properties
+    mol.nsQ = Array{Float64}(undef, mol.atomNum)
+    id = 0
+    for str in atomString
+        println("deb ", str)
+        nsString = split(str,"!")[2]
+        strArray = split(nsString)
+        id += 1
+        for i = 1:size(strArray,1)
+            if strArray[i] == "charge"
+                mol.nsQ[id] = parse(Float64, strArray[i+1])
+            end
+        end
+    end
+    
+    #mol.nsQ = collect( parse(Float64, ) for str in temp if str[1:6] == "ATOM" || str[1:6] == "HETATM" )
+    
+    
+    println(mol.atomName, " check", mol.nsQ)
     
     #connectivity
     mol.connect = Array{AbstractArray}(undef, mol.atomNum)
