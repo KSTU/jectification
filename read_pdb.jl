@@ -16,12 +16,13 @@ mutable struct molecule
     
     #non standart
     nsQ::AbstractArray #charge
-    
+    nsMass::AbstractArray #mass
+    nsFF::AbstractArray #atomname in force field
     #molType::AbstractArray #numbers of each type
 end
 
 function set_molecule()
-    return molecule(0,0,[0],[0],["0"],["0"],[0.0],[0.0],[0.0],[0,0],["a", "a"], [0.0, 0.0])
+    return molecule(0,0,[0],[0],["0"],["0"],[0.0],[0.0],[0.0],[0,0],["a", "a"], [0.0, 0.0], [0.0, 0.0], ["A", "B"])
 end
 
 function read_pdb(fileName)
@@ -39,20 +40,22 @@ function read_pdb(fileName)
     temp = collect(str for str in eachline(fileId) if length(str) > 6)  #need 2 step if length < 6
     atomString = collect(str for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")    #get atomstring
     
-    mol.atomName = collect(lstrip(str[13:16]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")
-    mol.molName = collect(lstrip(str[18:20]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")
-    mol.x = collect(parse(Float64,str[31:38]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")
-    mol.y = collect(parse(Float64,str[39:46]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")
-    mol.z = collect(parse(Float64,str[47:54]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")
+    mol.atomName = collect(lstrip(str[13:16]) for str in atomString)
+    mol.molName = collect(lstrip(str[18:20]) for str in atomString)
+    mol.x = collect(parse(Float64,str[31:38]) for str in atomString)
+    mol.y = collect(parse(Float64,str[39:46]) for str in atomString)
+    mol.z = collect(parse(Float64,str[47:54]) for str in atomString)
     
-    mol.curAtom = collect(parse(Int64,str[7:11]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")
-    mol.curMol = collect(parse(Int64,str[23:26]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")
-    mol.element = collect(lstrip(str[77:78]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM")
+    mol.curAtom = collect(parse(Int64,str[7:11]) for str in atomString)
+    mol.curMol = collect(parse(Int64,str[23:26]) for str in atomString)
+    mol.element = collect(lstrip(str[77:78]) for str in atomString)
     
-    mol.molNum = maximum(collect(parse(Int64,str[23:26]) for str in temp if str[1:6] == "ATOM  " || str[1:6] == "HETATM"))
+    mol.molNum = maximum(collect(parse(Int64,str[23:26]) for str in atomString))
     
     #nonstandart properties
     mol.nsQ = Array{Float64}(undef, mol.atomNum)
+    mol.nsMass = Array{Float64}(undef, mol.atomNum)
+    mol.nsFF = Array{String}(undef, mol.atomNum)
     id = 0
     for str in atomString
         println("deb ", str)
@@ -63,13 +66,19 @@ function read_pdb(fileName)
             if strArray[i] == "charge"
                 mol.nsQ[id] = parse(Float64, strArray[i+1])
             end
+            if strArray[i] == "mass"
+                mol.nsMass[id] = parse(Float64, strArray[i+1])
+            end
+            if strArray[i] == "ffaname"
+                mol.nsFF[id] = strArray[i+1]
+            end
         end
     end
     
     #mol.nsQ = collect( parse(Float64, ) for str in temp if str[1:6] == "ATOM" || str[1:6] == "HETATM" )
     
     
-    println(mol.atomName, " check", mol.nsQ)
+    println(mol.atomName, " check", mol.nsQ, mol.nsMass, mol.nsFF)
     
     #connectivity
     mol.connect = Array{AbstractArray}(undef, mol.atomNum)
