@@ -18,11 +18,13 @@ mutable struct molecule
     nsQ::AbstractArray #charge
     nsMass::AbstractArray #mass
     nsFF::AbstractArray #atomname in force field
-    #molType::AbstractArray #numbers of each type
+    
+    
+    molType::AbstractArray #numbers of each type
 end
 
 function set_molecule()
-    return molecule(0,0,[0],[0],["0"],["0"],[0.0],[0.0],[0.0],[0,0],["a", "a"], [0.0, 0.0], [0.0, 0.0], ["A", "B"])
+    return molecule(0,0,[0],[0],["0"],["0"],[0.0],[0.0],[0.0],[0,0],["a", "a"], [0.0, 0.0], [0.0, 0.0], ["A", "B"], [10, 10])
 end
 
 function read_pdb(fileName)
@@ -104,7 +106,10 @@ function read_pdb(fileName)
     #println(test)
 #    
     #println(mol.atomNum)
-    #println("test ", mol.connect)
+    println("test connection", mol.connect, typeof(mol.connect))
+    
+    
+    
     close(fileId)
     return mol
 end

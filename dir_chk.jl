@@ -68,6 +68,10 @@ function init_box_generate(cfg, onemol, ndx)
     box1.y = Array{Float64}(undef, box1.atomNum)
     box1.z = Array{Float64}(undef, box1.atomNum)
     box1.element = Array{String}(undef, box1.atomNum)
+    box1.nsQ = Array{Float64}(undef, box1.atomNum)
+    box1.nsMass = Array{Float64}(undef, box1.atomNum)
+    box1.nsFF = Array{String}(undef, box1.atomNum)
+    
     
     ncube = ceil(Int64, box1.molNum^(1/3))
     tempx = Array{Float64}(undef, ncube^3)
@@ -101,6 +105,10 @@ function init_box_generate(cfg, onemol, ndx)
                     box1.x[id] = tempx[rmol] + onemol[i].x[j]
                     box1.y[id] = tempy[rmol] + onemol[i].y[j]
                     box1.z[id] = tempz[rmol] + onemol[i].z[j]
+                    #set nonstandart part
+                    box1.nsQ[id] = onemol[i].nsQ[j]
+                    box1.nsMass[id] =onemol[i].nsMass[j]
+                    box1.nsFF[id] = onemol[i].nsFF[j]
                     #
                     if box1.x[id] < 0
                         box1.x[id] += cfg.inputVolume[ndx]^(1.0/3.0)
@@ -127,7 +135,7 @@ function init_box_generate(cfg, onemol, ndx)
             end
         end
     end
-    
+    box1.molType = molnum
     
     return [box1]
 end
