@@ -28,6 +28,14 @@ function psf_generate(cfg, box, onemol, fileName)
     bondAtomA = Array{AbstractArray}(undef, cfg.subNum)
     bondAtomB = Array{AbstractArray}(undef, cfg.subNum)
     nangles = zeros(Int64, cfg.subNum)  #numbers of angles
+    angleAtomA = Array{AbstractArray}(undef, cfg.subNum)
+    angleAtomB = Array{AbstractArray}(undef, cfg.subNum)
+    angleAtomC = Array{AbstractArray}(undef, cfg.subNum)
+    ntorsion = zeros(Int64, cfg.subNum) #numbers of torsion angle
+    torsionAtomA = Array{AbstractArray}(undef, cfg.subNum)
+    torsionAtomB = Array{AbstractArray}(undef, cfg.subNum)
+    torsionAtomC = Array{AbstractArray}(undef, cfg.subNum)
+    torsionAtomD = Array{AbstractArray}(undef, cfg.subNum)
     for i = 1:cfg.subNum
         #set zeroes
         connectarray = zeros(Int64, onemol[i].atomNum, onemol[i].atomNum)
@@ -55,10 +63,82 @@ function psf_generate(cfg, box, onemol, fileName)
             end
         end
         println("numbers of bond ", nbond[i], bondAtomA[i] ,bondAtomB[i] )
-        
+        #get angles number
+        for atoma = 1:onemol[i].atomNum
+            for atomb = 1:onemol[i].atomNum
+                for atomc = 1:onemol[i].atomNum
+                    if connectarray[atoma, atomb] == 1 && connectarray[atomb, atomc] == 1  && atomc > atoma
+                        println("aa ", atoma, " ab ", atomb, " ac ", atomc)
+                        nangles[i] += 1
+                    end
+                end
+            end
+        end
+        println("numbers af angles ", nangles[i])
+        angleAtomA[i] = zeros(Int64, nangles[i])
+        angleAtomB[i] = zeros(Int64, nangles[i])
+        angleAtomC[i] = zeros(Int64, nangles[i])
+        id = 0
+        for atoma = 1:onemol[i].atomNum
+            for atomb = 1:onemol[i].atomNum
+                for atomc = 1:onemol[i].atomNum
+                    if connectarray[atoma,atomb] == 1 && connectarray[atomb,atomc] == 1  && atomc > atoma
+                        id += 1
+                        angleAtomA[i][id] = atoma
+                        angleAtomB[i][id] = atomb
+                        angleAtomC[i][id] = atomc
+                    end
+                end
+            end
+        end
+        # calculate numbers of torsion angle
+        for atoma = 1:onemol[i].atomNum
+            for atomb = 1:onemol[i].atomNum
+                for atomc = 1:onemol[i].atomNum
+                    for atomd = 1:onemol[i].atomNum
+                        if connectarray[atoma,atomb] ==1 && connectarray[atomb,atomc] == 1 && connectarray[atomc,atomd] == 1 && atomd > atoma && atoma != atomc && atoma != atomd && atomb != atomc && atomb != atomd
+                            ntorsion[i] +=1
+                        end
+                    end
+                end
+            end
+        end
+        torsionAtomA[i] = zeros(Int64, ntorsion[i])
+        torsionAtomB[i] = zeros(Int64, ntorsion[i])
+        torsionAtomC[i] = zeros(Int64, ntorsion[i])
+        torsionAtomD[i] = zeros(Int64, ntorsion[i])
+        id = 0
+        for atoma = 1:onemol[i].atomNum
+            for atomb = 1:onemol[i].atomNum
+                for atomc = 1:onemol[i].atomNum
+                    for atomd = 1:onemol[i].atomNum
+                        if connectarray[atoma,atomb] ==1 && connectarray[atomb,atomc] == 1 && connectarray[atomc,atomd] == 1 && atomd > atoma && atoma != atomc && atoma != atomd && atomb != atomc && atomb != atomd
+                            id +=1
+                            torsionAtomA[i][id] = atoma
+                            torsionAtomB[i][id] = atomb
+                            torsionAtomC[i][id] = atomc
+                            torsionAtomD[i][id] = atomd
+                        end
+                    end
+                end
+            end
+        end
     end
     println(nbond, box.molType)
     println( sum(nbond .* box.molType))
+    #println("angle arrays ", angleAtomA, angleAtomB, angleAtomC)
+    for i = 1:cfg.subNum
+        for j = 1:nangles[i]
+            println("atoma ", angleAtomA[i][j], " atomb ", angleAtomB[i][j], " atomc ", angleAtomC[i][j])
+        end
+    end
+    for i = 1:cfg.subNum
+        println("substance ", i, "torsion angles ", ntorsion[i])
+        for j = 1:ntorsion[i]
+            println("atoma ", torsionAtomA[i][j], " atomb ", torsionAtomB[i][j], " atomc ", torsionAtomC[i][j], "atomd", torsionAtomD[i][j])
+        end
+    end
+    
     
     #print bonds 
     print(fileId, "\n")
@@ -69,7 +149,7 @@ function psf_generate(cfg, box, onemol, fileName)
         for j = 1:box.molType[i]
             for k = 1:nbond[i]
                 id += 1
-                print(fileId, "    ", bondAtomA[i][k]+curZero, "     " , bondAtomB[i][k] + curZero )
+                print(fileId, "   ", adj_right(bondAtomA[i][k]+curZero, 8 ), "   " , adj_right(bondAtomB[i][k] + curZero,8) )
                 if id % 3 == 0
                     print(fileId, "\n")
                 end
@@ -78,7 +158,7 @@ function psf_generate(cfg, box, onemol, fileName)
         end
     end
     
-    #angles
+    #print angles
     
     #dihedral
     
