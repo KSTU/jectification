@@ -9,7 +9,23 @@ function towhee_equlibrate(equlibrationCheck, equlibrationId)
         println("towhee equlibration error")
         exit()
     end
-    println(typeof(s),s)
+    ars = split(s,"\n")
+    for curString in ars
+        if (findfirst("Total Classical", curString) === nothing) == false
+            energy = parse(Float64, split(curString)[4])
+            println(energy, typeof(energy))
+        end
+        if (findfirst("Specific Density", curString) === nothing) == false
+            density = parse(Float64, split(curString)[4])
+            println(density, typeof(density))
+        end
+        if (findfirst("Virial Pressure", curString) === nothing) == false
+            pressure = parse(Float64, split(curString)[4])
+            println(pressure, typeof(pressure))
+        end
+    end
+#    ars = split(s,"\n")
+#    println(typeof(ars),ars)
     close(fileId)
 end
 
