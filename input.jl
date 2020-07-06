@@ -2,6 +2,7 @@ mutable struct config
     #substance
     subNum::Int64
     subName::AbstractArray
+    subDim::String
     #flows
     totalPlates::Int64
     inputPlates::AbstractArray
@@ -16,10 +17,31 @@ mutable struct config
     inputVolume::AbstractArray
     
     plateVolume::AbstractArray
+    back::String
+    ffname::String
+    dir::String
 end
 
 function set_config()
-    return config(0,["0","0"],0,[0,0],0,[0,0],[0,0],["NVT","NVT"],"NONE",[1.0, 1.0],[1.0, 1.0], [1.0, 1.0],[1.0,1.0], [1.0, 1.0])
+    return config(0,    #subNum
+    ["0","0"],  #subName
+    "D1",   #substance dimension
+    0,  #totalPlates
+    [0,0],  #inputPlates
+    0,  #inputNumber
+    [0,0],  #inputMolecules
+    [0,0],  #inputInitMolecules
+    ["NVT","NVT"],  #inputEnsamble
+    "NONE", #initialState
+    [1.0, 1.0], #inputTemperature
+    [1.0, 1.0], #inputPressure
+    [1.0, 1.0], #inputDensity
+    [1.0,1.0],  #inputVolume
+    [1.0, 1.0], #plateVolume
+    "back",  #back
+    "ffname",   #forcefield name
+    "dir"
+    ) 
 end
 
 function read_config(fileName)
@@ -92,24 +114,38 @@ fileId = open(fileName, "r")
                 cfg.inputDensity = write
             end
             #read plate volume
-            if rstrip(split(rem, "=")[1]) == "input_density"
+            if rstrip(split(rem, "=")[1]) == "plate_volume"
                 write = collect(parse(Float64,i) for i in (split(split(rem, "=")[2])))
+                println(write, write[1], cfg.inputPlates)
                 if(size(write,1) == 1)
-                    cfg.plateVolume = fill(write, cfg.inputPlates)
+                    cfg.plateVolume = fill(write[1], cfg.inputNumber)
                 else
                     cfg.plateVolume = write
                 end
             end
-            
+            #read backend for monte carlo
+            if rstrip(split(rem, "=")[1]) == "mc_backend"
+                cfg.back = rstrip(lstrip(split(rem, "=")[2]))
+            end
+            #read ff fileName
+            if rstrip(split(rem, "=")[1]) == "ffname"
+                cfg.ffname = rstrip(lstrip(split(rem, "=")[2]))
+            end
+            #read substance dimension
+            if rstrip(split(rem, "=")[1]) == "sub_dim"
+                cfg.subDim = rstrip(lstrip(split(rem, "=")[2]))
+            end
             
             #set calculated pllates parameters
             cfg.inputVolume = Array{Float64}(cfg.inputPlates)
             
         end
     end
+    cfg.dir = pwd()
 close(fileId)
-return cfg
+println(cfg)
 println("config read done")
+return cfg
 end
 
 function get_error(error, file, line)

@@ -60,7 +60,7 @@ function read_pdb(fileName)
     mol.nsFF = Array{String}(undef, mol.atomNum)
     id = 0
     for str in atomString
-        println("deb ", str)
+        #println("deb ", str)
         nsString = split(str,"!")[2]
         strArray = split(nsString)
         id += 1

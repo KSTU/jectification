@@ -1,6 +1,9 @@
 #substane
-sub_name = mol3.pdb mol2.pdb
+sub_name = ethane.pdb propane.pdb
+#substance dinmensions 1D 3D 4D (configurational bias)
+sub_dim = 3D    
 
+mc_backend = towhee
 
 #material flows
 total_plates = 6
@@ -8,9 +11,9 @@ input_plates = 3 4
 input_molecules1 = 330 230
 input_molecules2 = 220 120
 input_ensamble = NVT NPT
-input_init_molecules = 4000 4000
+input_init_molecules = 800 800
 initial_state = VAK
-input_temperature = 200.0 200.0
+input_temperature = 200.0 250.0
 
 #used only in NPT GEMC_NPT (bar)
 input_pressure = 2.0  2.0
@@ -22,6 +25,7 @@ plate_volume = 10000
 
 potential = LJ
 charge = false
+ffname = towhee_ff_TraPPE-UA
 
 
 

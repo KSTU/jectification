@@ -141,26 +141,65 @@ function psf_generate(cfg, box, onemol, fileName)
     
     
     #print bonds 
-    print(fileId, "\n")
-    print(fileId, sum(nbond .* box.molType) ," !NBOND: bonds\n")
-    id = 0
-    curZero = 0 #zero for current molecule
-    for i = 1:cfg.subNum
-        for j = 1:box.molType[i]
-            for k = 1:nbond[i]
-                id += 1
-                print(fileId, "   ", adj_right(bondAtomA[i][k]+curZero, 8 ), "   " , adj_right(bondAtomB[i][k] + curZero,8) )
-                if id % 3 == 0
-                    print(fileId, "\n")
+    if maximum(nbond) > 0
+        print(fileId, "\n")
+        print(fileId, adj_right(sum(nbond .* box.molType), 10) ," !NBOND: bonds\n")
+        id = 0
+        curZero = 0 #zero for current molecule
+        for i = 1:cfg.subNum
+            for j = 1:box.molType[i]
+                for k = 1:nbond[i]
+                    id += 1
+                    print(fileId, "   ", adj_right(bondAtomA[i][k]+curZero, 8 ), "   " , adj_right(bondAtomB[i][k] + curZero,8) )
+                    if id % 3 == 0
+                        print(fileId, "\n")
+                    end
                 end
+                curZero += onemol[i].atomNum
             end
-            curZero += onemol[i].atomNum
         end
     end
     
     #print angles
+    if maximum(nangles) > 0
+        print(fileId, "\n")
+        print(fileId, adj_right(sum(nangles .* box.molType), 10), " !NTHETA: angles \n")
+        id = 0
+        curZero = 0
+        for i = 1:cfg.subNum
+            for j = 1:box.molType[i]
+                for k = 1:nangles[i]
+                    id += 1
+                    print(fileId, "   ", adj_right(angleAtomA[i][k] + curZero, 8), "   ", adj_right(angleAtomB[i][k] + curZero, 8), "   ", adj_right(angleAtomC[i][k] + curZero, 10))
+                    if id % 3 == 0
+                        print(fileId, "\n")
+                    end
+                end
+                curZero += onemol[i].atomNum
+            end
+        end
+    end
     
     #dihedral
+    if maximum(ntorsion) > 0
+        print(fileId, "\n")
+        print(fileId, adj_right(sum(ntorsion .* box.molType), 10), " !NPHI: dihedrals \n")
+        id = 0
+        curZero = 0
+        for i = 1:cfg.subNum
+            for j = 1:box.molType[i]
+                for k = 1:ntorsion[i]
+                    id += 1
+                    print(fileId, "   ", adj_right(torsionAtomA[i][k] + curZero, 8), "   ", adj_right(torsionAtomB[i][k] + curZero, 8), "   ", adj_right(torsionAtomC[i][k] + curZero, 10), "   ", adj_right(torsionAtomD[i][k] + curZero, 8))
+                    if id % 2 == 0
+                        print(fileId, "\n")
+                    end
+                end
+                curZero += onemol[i].atomNum
+            end
+        end
+    end
+    
     
     
     
