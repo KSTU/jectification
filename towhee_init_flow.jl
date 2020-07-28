@@ -5,12 +5,12 @@ function generate_towhee_flow(onemol, cfg)
     for ndx = 1:size(cfg.inputPlates,1)
         #if NVT ensable
         cd("flow$(ndx)")
-        towhee_initial(onemol, cfg, ndx)
+        towhee_initial(onemol, cfg, ndx, 1, true)
         cd("..")
     end
 end
 
-function towhee_initial(onemol, cfg, ndx)
+function towhee_initial(onemol, cfg, ndx, nloop, initial)
     fileId = open("towhee_input", "w")
     println(fileId, "ensemble")
     if cfg.inputEnsamble[ndx] == "NVT"
@@ -41,13 +41,13 @@ function towhee_initial(onemol, cfg, ndx)
     println(fileId, "stepstyle")
     println(fileId, "'moves'")
     println(fileId, "nstep")
-    println(fileId, sum(cfg.inputMolecules[ndx,:]) * scale * 1)
+    println(fileId, sum(cfg.inputMolecules[ndx,:]) * scale * 2 * nloop)
     println(fileId, "printfreq")
-    println(fileId, 5000)
+    println(fileId, 1000)
     println(fileId, "blocksize")
-    println(fileId, sum(cfg.inputMolecules[ndx,:]) * scale * 1)
+    println(fileId, sum(cfg.inputMolecules[ndx,:]) * scale * 2 * nloop)
     println(fileId, "moviefreq")
-    println(fileId, 5000)
+    println(fileId, 1000)
     println(fileId, "backupfreq")
     println(fileId, 5000)
     println(fileId, "runoutput")
@@ -63,7 +63,12 @@ function towhee_initial(onemol, cfg, ndx)
 #    println(fileId, "chempotperstep")
 #    println(fileId, 0)
     println(fileId, "linit")
-    println(fileId, ".true.")
+    if initial == true
+        println(fileId, ".true.")
+    else
+        println(fileId, ".false.")
+    end
+    
     if cfg.inputEnsamble[ndx] == "NVT" || cfg.inputEnsamble[ndx] == "NPT"
         println(fileId, "initboxtype")
         println(fileId, "'dimensions'")

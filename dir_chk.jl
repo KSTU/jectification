@@ -1,6 +1,6 @@
 ##
-function folder_check(dirname)
-    for i = 1:size(cfg.inputPlates,1)
+function folder_check(folderNumber, dirname)
+    for i = 1:folderNumber
         if(isdir("$(dirname)$(i)"))
             rm("$(dirname)$(i)", recursive=true)
         end

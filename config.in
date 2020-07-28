@@ -4,6 +4,8 @@ sub_name = ethane.pdb propane.pdb
 sub_dim = 3D    
 
 mc_backend = towhee
+#production restart
+condition = restart
 
 #material flows
 total_plates = 6

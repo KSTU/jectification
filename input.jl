@@ -20,6 +20,7 @@ mutable struct config
     back::String
     ffname::String
     dir::String
+    condition::String
 end
 
 function set_config()
@@ -40,7 +41,8 @@ function set_config()
     [1.0, 1.0], #plateVolume
     "back",  #back
     "ffname",   #forcefield name
-    "dir"
+    "dir",  #
+    "start" #
     ) 
 end
 
@@ -126,6 +128,10 @@ fileId = open(fileName, "r")
             #read backend for monte carlo
             if rstrip(split(rem, "=")[1]) == "mc_backend"
                 cfg.back = rstrip(lstrip(split(rem, "=")[2]))
+            end
+            #read program condition
+            if rstrip(split(rem, "=")[1]) == "condition"
+                cfg.condition = rstrip(lstrip(split(rem, "=")[2]))
             end
             #read ff fileName
             if rstrip(split(rem, "=")[1]) == "ffname"
