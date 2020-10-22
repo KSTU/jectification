@@ -118,9 +118,9 @@ fileId = open(fileName, "r")
             #read plate volume
             if rstrip(split(rem, "=")[1]) == "plate_volume"
                 write = collect(parse(Float64,i) for i in (split(split(rem, "=")[2])))
-                println(write, write[1], cfg.inputPlates)
+                #println(write, write[1], cfg.inputPlates)
                 if(size(write,1) == 1)
-                    cfg.plateVolume = fill(write[1], cfg.inputNumber)
+                    cfg.plateVolume = fill(write[1], cfg.totalPlates)
                 else
                     cfg.plateVolume = write
                 end
@@ -158,6 +158,4 @@ function get_error(error, file, line)
     println(error, " file name: $(file) line number $(line) ")
     exit()
 end
-
-
 

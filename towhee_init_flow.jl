@@ -6,6 +6,7 @@ function generate_towhee_flow(onemol, cfg)
         #if NVT ensable
         cd("flow$(ndx)")
         towhee_initial(onemol, cfg, ndx, 1, true)
+        towhee_coords_initial(onemol, cfg, cfg.inputMolecules, ndx)
         cd("..")
     end
 end
@@ -244,3 +245,42 @@ function towhee_initial(onemol, cfg, ndx, nloop, initial)
     close(fileId)
     println(onemol[2].connect)
 end
+
+function towhee_coords_initial(onemol, cfg, nmol, ndx)
+    scale = ceil(Int64, cfg.inputInitMolecules[ndx] / sum(cfg.inputMolecules[ndx,:]))
+    h = (scale * sum(cfg.inputMolecules[ndx,:]) / (cfg.inputDensity[ndx] * 6.02214076 /10^4))^(1/3)
+    h = h - 1
+    fileId = open("packmol.inp", "w")
+    print(fileId, "#\n#\n#\n\n")
+    println(fileId, "tolerance 3.0")
+    println(fileId, "filetype pdb")
+    println(fileId, "output towhee_coords.pdb")
+    
+    for i = 1:cfg.subNum
+        println(fileId, "structure ../$(cfg.subName[i])")
+        println(fileId, " number $(nmol[i] * scale)")
+        println(fileId, "inside box 0. 0. 0.  $(h)  $(h)  $(h)")
+        println(fileId, "end structure\n")
+    end
+    
+    close(fileId)
+    
+    run(pipeline(`packmol`, stdin="packmol.inp"))
+    pdb_2_xyz("towhee_coords.pdb", "towhee_coords")
+    
+end
+
+function pdb_2_xyz(infile, outfile)
+    fileIdIn = open(infile)
+    fileIdOut = open(outfile, "w")
+    for i in eachline(fileIdIn)
+        if length(i) >6
+            if i[1:6] == "HETATM" || i[1:6] == "ATOM  "
+                print(fileIdOut, parse(Float64, i[31:38]) + 0.5, "  ", parse(Float64, i[39:46]) + 0.5, "  ", parse(Float64, i[47:54])+0.5,"\n")
+            end
+        end
+    end
+    close(fileIdOut)
+    close(fileIdIn)
+end
+

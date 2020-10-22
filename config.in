@@ -1,29 +1,28 @@
 #substane
-sub_name = ethane.pdb propane.pdb
+sub_name = ethane.pdb ethylene.pdb
 #substance dinmensions 1D 3D 4D (configurational bias)
 sub_dim = 3D    
 
 mc_backend = towhee
-#production restart
-condition = restart
+#production restart rectstart
+condition = rectstart
 
 #material flows
 total_plates = 6
-input_plates = 3 4
-input_molecules1 = 330 230
-input_molecules2 = 220 120
-input_ensamble = NVT NPT
-input_init_molecules = 800 800
+input_plates = 3
+input_molecules1 = 200 300
+input_ensamble = NPT
+input_init_molecules = 800
 initial_state = VAK
-input_temperature = 200.0 250.0
+input_temperature = 240.0
 
 #used only in NPT GEMC_NPT (bar)
-input_pressure = 2.0  2.0
+input_pressure = 15.0
 #used for NVT (mol/l)
-input_density = 20.0   20.0
+input_density = 20.0
 
 #plate volume Angstrom
-plate_volume = 10000
+plate_volume = 100000
 
 potential = LJ
 charge = false
